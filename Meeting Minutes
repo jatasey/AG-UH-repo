@@ -1,0 +1,9 @@
+Nov 16th Meeting Notes
+Attendees: Phil and Alex
+Subject: GitHub Repository - data analysis - Multiple Linear Regression - end of term goals - Consider inclusion of Uncertainty Analysis with NWS perspective
+
+To do: 
+1. Start a new notebook using Multiple Linear Regression analysis to determine the significance or weighted sum of the predictors
+2. Normalize variables - make them a fraction or % of the range between 0 and 1: (i.e. Runlength > 2hr = 0 and 6hr = 1 ; Resolution 0 = 5m, .4 = 7m, 1=10m)
+3. Normalize everthing to 2% regression
+4. Continue to build on data sample via simulations
