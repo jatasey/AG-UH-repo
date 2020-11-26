@@ -37,7 +37,7 @@ Tp=18
 step=3600
 
 # iterate through sensitivity simulations: 
-for i in 0.035 0.07 0.10 0.25 
+for i in 0.01 0.035 0.07 0.10 0.25 
 do
 	# change back to working dir
 	cd ${RUNdir}
@@ -144,8 +144,7 @@ do
 
 					SECONDS=$((${RUNTIME} * ${step}))
 
-                                        #if [ ${RPTAB} == ${SECONDS} ] && [ ${SUNTAB} == ${SECONDS} ] && [ ${VLANDTAB} == ${SECONDS} ] 
-					#then
+                                 
 					# ARCHIVE THE DATA
 					cp ${RUNdir}/2m.tab ${DATAdir}
                                         cp ${RUNdir}/2msun.tab ${DATAdir}
@@ -173,10 +172,7 @@ do
 					done
 					# change back to working dir
 					cd ${RUNdir}
-                                       #  else
-				       #         echo "Run didn't finish - Final time step didn't match run time. " >> ${RUNlog}
-				       #		cd ${RUNdir}							
-				#	fi
+                                   
                                 done
                         done	 
         done
