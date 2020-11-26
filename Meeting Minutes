@@ -7,3 +7,7 @@ To do:
 2. Normalize variables - make them a fraction or % of the range between 0 and 1: (i.e. Runlength > 2hr = 0 and 6hr = 1 ; Resolution 0 = 5m, .4 = 7m, 1=10m)
 3. Normalize everthing to 2% regression
 4. Continue to build on data sample via simulations
+
+Nov 25th Meeting Notes
+Attendees: Phil and Alex
+Subject:  autorun.sh script, newly committed data, MLR notebook from Phil, normalizing data and future simulations
