@@ -1,6 +1,13 @@
 Results at the 2m Rock Piles output point for three identical simulations. 
 Tests reveal identical results. 
 
+%
+%
+% Run:UH    Table:2m                SWASH version: 6.01
+%
+%       Tsec          Depth         Watlev        Botlev        Setup         Hsig          FrCoef        Hrunup
+%       [s]           [m]           [m]           [m]           [m]           [m]           [ ]           [ ]
+
 TEST 1 
    7191.00000        2.4534       -0.1613        2.6147   6386.230957       0.00000      0.250000            1.
    7192.00000        2.4668       -0.1479        2.6147   6384.653809       0.00000      0.250000            1.
