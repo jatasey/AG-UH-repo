@@ -16,3 +16,5 @@ Subject:  autorun.sh script, newly committed data, MLR notebook from Phil, norma
 2. Continue to test MLR Python Notebook Phil started and 
 3. Continue running automated sensitivity tests in the background. 
 4. Explore random simulations in the test through random # generator with BASH
+5. Consider Non-linear Regression approach
+6. Explore ways to validate or fit data to Pat's impact thresholds. 
