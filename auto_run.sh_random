@@ -1,0 +1,181 @@
+#!/bin/bash
+
+start=$(date)
+BEGIN=$(date +%s)
+HOST=$(hostname)
+
+echo "-----------------------------------------------------" > ${RUNlog}
+echo "TESTCASE BEGINS: $start                     Host:$HOST" >> ${RUNlog}
+echo "-----------------------------------------------------" >> ${RUNlog}
+echo " " >> ${RUNlog}
+echo "SWASH TESTCASE RUNNING" >> ${RUNlog}
+echo " " >> ${RUNlog}
+
+RUNdir="${PROJECTdir}/testcases/swash/testcases/northshore"
+RUNlog="${PROJECTdir}/testcases/swash/testcases/northshore/runlog.log"
+DATAdir="${PROJECTdir}/testcases/swash/testcases/northshore/data"
+INPUTtemp="${PROJECTdir}/testcases/swash/testcases/northshore/template/INPUT_temp"
+SWASHexe="${PROJECTdir}/lib64/swash/bin/swash-mpi.exe"
+mpiexe="${PROJECTdir}/lib64/mpich/bin/mpiexec"
+timeseriesx="${PROJECTdir}/testcases/swash/testcases/northshore/template/timeseries.py"
+python="${PROJECTdir}/lib64/anaconda3/bin/python"
+
+# Change to working dir
+cd ${RUNdir}
+
+# Clean old files
+# rm ${DATAdir}/finalData* ${DATAdir}/runsum*txt ${DATAdir}/*tab*
+
+# Model CGRID SPECs: 10m, 8x6m, 5m:
+CGRID_tenm="CGRID 8841.0 7339.0 40.0 12105 9005 1210 900"
+CGRID_ninem="CGRID 8841.0 7339.0 40.0 12105 9005 1345 1000"
+CGRID_eightm="CGRID 8841.0 7339.0 40.0 12105 9005 1513 1125"
+CGRID_sevenm="CGRID 8841.0 7339.0 40.0 12105 9005 1729 1285"
+CGRID_sixm="CGRID 8841.0 7339.0 40.0 12105 9005 2017 1125"
+CGRID_fivem="CGRID 8841.0 7339.0 40.0 12105 9005 2420 1285"
+
+# Boundary Conditions:
+step="0"
+
+# The section below will iterate through 300 random simulations
+# while varying: S Tp FrCoef WLEV Runtime Resolution
+#
+
+while [ $step -lt 300 ]
+do
+	# Create random values for model input parms bounded within 
+        SWHT=`shuf -i 1-7 -n 1`
+        Tp=`shuf -i 9-18 -n 1`
+        FRICTION=`seq 0 .01 .25 | shuf | head -n1`
+        WLEV=`seq 0 .1 .775 | shuf | head -n1`
+        RESOLUTION=`shuf -i 5-10 -n 1`
+        RUNTIME=2
+
+        echo "$SWHT $Tp $FRICTION $WLEV $RUNTIME $RESOLUTION"  >> ${RUNlog}
+
+        # chane back to working dir
+        cd ${RUNdir}
+
+        # Clean Tab Files from previous runs
+        rm PRINT*
+        rm Err*
+        rm *tab*
+
+        # Prep INPUT File for simulation
+        sed -e "s/###FRIKNOB###/${FRICTION}/g" ${INPUTtemp} > ${RUNdir}/INPUT
+        sed -i "s/###SWHT###/${SWHT}/g" INPUT
+        sed -i "s/###Tp###/${Tp}/g" INPUT
+        sed -i "s/###WLEV###/${WLEV}/g" INPUT
+        sed -i "s/###HR###/${RUNTIME}/g" INPUT
+
+        if [ ${RESOLUTION} == "10" ]
+        then
+                sed -i "s/###CGRID###/${CGRID_tenm}/g" INPUT
+        fi
+        if [ ${RESOLUTION} == "9" ]
+        then
+                sed -i "s/###CGRID###/${CGRID_ninem}/g" INPUT
+        fi
+        if [ ${RESOLUTION} == "8" ]
+        then
+                sed -i "s/###CGRID###/${CGRID_eightm}/g" INPUT
+        fi
+        if [ ${RESOLUTION} == "7" ]
+        then
+                sed -i "s/###CGRID###/${CGRID_sevenm}/g" INPUT
+        fi
+        if [ ${RESOLUTION} == "6" ]
+        then
+                sed -i "s/###CGRID###/${CGRID_sixm}/g" INPUT
+        fi
+	if [ ${RESOLUTION} == "5" ]
+        then
+                sed -i "s/###CGRID###/${CGRID_fivem}/g" INPUT
+        fi
+
+        # EXECUTE SIMULATION
+        ${mpiexe} -n 48 ${SWASHexe}
+
+        # POST PROCESS DATA
+        cp PRINT-001 ${DATAdir}/PRINT_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+
+        # ENSURE THE RUN FINISHED AND THE REQUIRED FILES EXISTS
+        if [ -f "2m.tab" ] && [ "2msun.tab" ] && [ "vland.tab" ]
+        then
+                echo "Data files exist and run finished as designed." >> ${RUNlog}
+                RPTAB=`tail -n1 ${RUNdir}/2m.tab | awk '{print $1}' | cut -c 1-4`
+                SUNTAB=`tail -n1 ${RUNdir}/2msun.tab | awk '{print $1}' | cut -c 1-4`
+                VLANDTAB=`tail -n1 ${RUNdir}/vland.tab | awk '{print $1}' | cut -c 1-4`
+
+                # make a backup of files
+                cp ${RUNdir}/2m.tab ${DATAdir}/2m.tab_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+                cp ${RUNdir}/2msun.tab ${DATAdir}/2msun.tab_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+                cp ${RUNdir}/vland.tab ${DATAdir}/vland.tab_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+        else
+                echo "Data files don't exist - check for backup raw files" >> ${RUNlog}
+                twometertab=`find -L 2m.tab* -type f ! -size 0`
+                twometersuntab=`find -L 2msun.tab* -type f ! -size 0`
+                twometervland=`find -L vland.tab* -type f ! -size 0`
+
+                # Rename files
+                mv ${twometertab} 2m.tab
+                mv ${twometersuntab} 2msun.tab
+                mv ${twometervland} vland.tab
+
+                RPTAB=`tail -n1 ${RUNdir}/2m.tab | awk '{print $1}' | cut -c 1-4`
+                SUNTAB=`tail -n1 ${RUNdir}/2msun.tab | awk '{print $1}' | cut -c 1-4`
+                VLANDTAB=`tail -n1 ${RUNdir}/vland.tab | awk '{print $1}' | cut -c 1-4`
+
+                # make a backup of files
+                cp ${RUNdir}/2m.tab ${DATAdir}/2m.tab_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+                cp ${RUNdir}/2msun.tab ${DATAdir}/2msun.tab_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+                cp ${RUNdir}/vland.tab ${DATAdir}/vland.tab_${SWHT}_${Tp}_${FRICTION}_${WLEV}_${RUNTIME}_${RESOLUTION}
+        fi
+
+	# One last check - abort if there are no files and investigate issues
+        if [ -f "2m.tab" ] && [ "2msun.tab" ] && [ "vland.tab" ]
+        then
+                echo "Final Data Check Test - Data files exist." >> ${RUNlog}
+        else
+                echo "Final Data Check test - Data files don't exist - something went wrong - aborting." >> ${RUNlog}
+        fi
+
+        SECONDS=$((${RUNTIME} * ${step}))
+
+        # ARCHIVE THE DATA
+        cp ${RUNdir}/2m.tab ${DATAdir}
+        cp ${RUNdir}/2msun.tab ${DATAdir}
+        cp ${RUNdir}/vland.tab ${DATAdir}
+
+        if [ ${RPTAB} -gt 4500 ]
+        then
+                sed -i '1,3607d' ${DATAdir}/*tab
+		cd ${DATAdir}
+		rm runsum_*.txt
+
+		for i in 2m 2msun vland
+		do
+			# Copy over timeseries script template and process Data:
+	                sed -e "s/###datafile###/${i}/g" ${timeseriesx} > ${DATAdir}/timeseries.py
+
+        	        # Crunch 2% SETUP Hss Hig values
+        	 	${python} timeseries.py
+                	python timeseries.py
+                	runsum=`cat runsum_${i}.txt`
+                	echo "${SWHT} ${Tp} ${FRICTION} ${WLEV}  ${RUNTIME}  ${RESOLUTION}  ${runsum}" >> finalData_${i}
+        	done
+        else
+                echo "Run doesn't have a sufficient amount of data" >> ${RUNlog}
+
+		# Add NaNs to the data file
+		for i in 2m 2msun vland
+                do
+			echo "${SWHT} ${Tp} ${FRICTION} ${WLEV}  ${RUNTIME}  ${RESOLUTION}  Nan NaN NaN NaN " >> finalData_${i}
+		done
+        fi
+
+        # change back to working dir
+        cd ${RUNdir}
+
+        step=$[$step+1]
+done
