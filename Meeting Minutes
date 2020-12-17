@@ -12,9 +12,15 @@ Nov 25th Meeting Notes
 Attendees: Phil and Alex
 Subject:  autorun.sh script, newly committed data, MLR notebook from Phil, normalizing data and future simulations
 
-1. Complete 3 identical runs to test similarity of output
-2. Continue to test MLR Python Notebook Phil started and 
-3. Continue running automated sensitivity tests in the background. 
-4. Explore random simulations in the test through random # generator with BASH
-5. Consider Non-linear Regression approach
-6. Explore ways to validate or fit data to Pat's impact thresholds. 
+1. Complete 3 identical runs to test similarity of output - done by AG
+2. Continue to test MLR Python Notebook Phil started and - in progress
+3. Continue running automated sensitivity tests in the background. - running
+4. Explore random simulations in the test through random # generator with BASH - done AG
+5. Consider Non-linear Regression approach - in progress
+6. Explore ways to validate or fit data to Pat's impact thresholds. in progress.  
+
+Dec 17th 2020 Meeting Notes
+Attendees: Phil and Alex
+Subject: Random seeding script and output 2m sample updated, LR Adv/Warning, Type of non-linear regression for multi-variables. 
+
+
