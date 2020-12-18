@@ -23,4 +23,10 @@ Dec 17th 2020 Meeting Notes
 Attendees: Phil and Alex
 Subject: Random seeding script and output 2m sample updated, LR Adv/Warning, Type of non-linear regression for multi-variables. 
 
+1. Relate water levels used from the random generator to actual water levels relative to MHHW and MSL. 
+2. Find some way to relate 2% WLEVs to impact thresholds. 
+3. What can we say about the output when we know nothing about the friction. How does the output change once we know the friction. 
+4. Does the NWS have actual impact water level thresholds? 
+5. LR model - provide a paper from Greg. 
+
 
